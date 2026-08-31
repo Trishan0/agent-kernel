@@ -1,0 +1,58 @@
+# Deployed (AWS serverless) configuration. deploy.sh copies this over config.yaml into each
+# Lambda package. Terraform injects every table/queue/role coordinate as an AK_* env var; the
+# `type` values must be declared here or the capability silently falls back to the in-process
+# backends, which do not survive a Lambda invocation.
+
+logging:
+  ak:
+    level: INFO
+
+session:
+  type: dynamodb
+  dynamodb:
+    table_name: ""   # AK_SESSION__DYNAMODB__TABLE_NAME
+
+telegram:
+  agent: watchdog_supervisor
+  api_version: bot
+  # bot_token / webhook_secret from AK_TELEGRAM__BOT_TOKEN / AK_TELEGRAM__WEBHOOK_SECRET
+
+sandbox:
+  enabled: true
+  type: local_subprocess   # runs inside the agent-runner Lambda's /tmp; no isolation
+  local_subprocess:
+    workdir: /tmp/ew-sandbox
+  scope: per_session
+  agents:
+    - anomaly_detector
+
+schedule:
+  provider:
+    type: eventbridge
+    eventbridge:
+      group_name: ""   # AK_SCHEDULE__PROVIDER__EVENTBRIDGE__GROUP_NAME
+      role_arn: ""     # AK_SCHEDULE__PROVIDER__EVENTBRIDGE__ROLE_ARN
+      queue_arn: ""    # AK_SCHEDULE__PROVIDER__EVENTBRIDGE__QUEUE_ARN
+  store:
+    type: dynamodb
+    dynamodb:
+      table_name: ""   # AK_SCHEDULE__STORE__DYNAMODB__TABLE_NAME
+      ttl: 0           # 0 disables expiry: a vanished task would stop firing silently
+  agents:
+    - case_manager
+
+execution:
+  mode: rest_sync
+  queues:
+    type: sqs
+    input:
+      max_receive_count: 3
+    output:
+      max_receive_count: 3
+  response_store:
+    type: dynamodb
+    retry_count: 10
+    delay: 3
+    dynamodb:
+      table_name: ""   # AK_EXECUTION__RESPONSE_STORE__DYNAMODB__TABLE_NAME
+      ttl: 300

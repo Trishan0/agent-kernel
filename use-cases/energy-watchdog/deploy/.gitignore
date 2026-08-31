@@ -1,0 +1,12 @@
+.terraform/
+.terraform.lock.hcl
+requirements.txt
+dist_*/
+*.zip
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+terraform.tfvars
+*.auto.tfvars
