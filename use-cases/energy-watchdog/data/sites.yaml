@@ -8,10 +8,13 @@ sites:
     solar_kwp: 100
     telegram_chat_id: -1001234567890
     tariff:
-      # Fill from the current CEB commercial tariff schedule. Placeholders below.
-      peak_lkr_per_kwh: 0.0
-      day_lkr_per_kwh: 0.0
-      offpeak_lkr_per_kwh: 0.0
+      # CEB commercial time-of-use bands (LKR/kWh). PLACEHOLDER figures in the vicinity of the
+      # current CEB "General Purpose" TOU schedule — confirm against the live CEB tariff before
+      # the demo (a judge may ask where the rupee figure comes from). Band *times* follow the
+      # CEB TOU schedule and live in data/sites.py; only the rates live here.
+      peak_lkr_per_kwh: 70.0
+      day_lkr_per_kwh: 45.0
+      offpeak_lkr_per_kwh: 32.0
     calendar:
       working_days: [mon, tue, wed, thu, fri, sat]
       closed_dates: ["2026-08-25"]
@@ -20,6 +23,26 @@ sites:
       baseload_creep_min_kw: 2
       solar_yield_floor_pct: 75
       off_schedule_load_pct: 40
+
   - site_id: kandy-hotel-1
-    # ... a second site with solar_kwp: 0, its own chat id, and no injected faults,
-    # to prove that silence works
+    name: Kandy Hotel 1
+    latitude: 7.2906
+    longitude: 80.6337
+    timezone: Asia/Colombo
+    connected_load_kw: 120
+    solar_kwp: 0
+    telegram_chat_id: -1009876543210
+    tariff:
+      peak_lkr_per_kwh: 70.0
+      day_lkr_per_kwh: 45.0
+      offpeak_lkr_per_kwh: 32.0
+    calendar:
+      # A hotel runs seven days a week and never books a closed date, so nothing here can trip
+      # the off-schedule detector — this site exists to prove a healthy site stays silent.
+      working_days: [mon, tue, wed, thu, fri, sat, sun]
+      closed_dates: []
+    thresholds:
+      baseload_creep_pct: 15
+      baseload_creep_min_kw: 2
+      solar_yield_floor_pct: 75
+      off_schedule_load_pct: 40

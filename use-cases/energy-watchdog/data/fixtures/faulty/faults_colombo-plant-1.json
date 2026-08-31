@@ -1,0 +1,16 @@
+[
+  {
+    "type": "baseload_creep",
+    "from": "2026-08-20",
+    "magnitude": 6.0
+  },
+  {
+    "type": "solar_string_failure",
+    "from": "2026-08-22",
+    "magnitude": 0.7
+  },
+  {
+    "type": "holiday_load",
+    "date": "2026-08-25"
+  }
+]

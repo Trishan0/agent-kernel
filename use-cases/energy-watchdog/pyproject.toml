@@ -10,6 +10,15 @@ dependencies = [
     "httpx>=0.27",
 ]
 
+[project.optional-dependencies]
+# Per-Lambda dependency sets for the AWS serverless deploy (deploy/deploy.sh installs each with
+# `uv export --extra <name>`). The request/response handlers only enqueue/dequeue, so they omit
+# the OpenAI Agents SDK; only the agent runner runs the agents (and needs pandas for the
+# detectors). agentkernel resolves from ../../ak-py via [tool.uv.sources].
+request_handler = ["agentkernel[aws,cron,telegram,api]>=0.8.1", "httpx>=0.27"]
+response_handler = ["agentkernel[aws]>=0.8.1"]
+agent_runner = ["agentkernel[aws,openai,cron,telegram]>=0.8.1", "pandas>=2.2", "httpx>=0.27"]
+
 [dependency-groups]
 dev = [
     "agentkernel[test]>=0.8.1",
@@ -28,6 +37,14 @@ agentkernel = { path = "../../ak-py", editable = true }
 [tool.isort]
 profile = "black"
 line_length = 120
+known_first_party = ["agent", "tool", "sites", "solar_model", "detectors", "llm", "investigate"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "integration: waits on a live scheduler thread or server; deselect with -m 'not integration'",
+]
 
 [tool.black]
 line-length = 120

@@ -1,0 +1,59 @@
+# Agent Kernel local development configuration for the Energy Anomaly Watchdog.
+#
+# Every key below is verified against ak-py/src/agentkernel/core/config.py (AKConfig) and the
+# working examples/api/schedule-openai + examples/api/telegram configs. See SPEC.md "Local
+# Development" and AGENTS.md "Scheduling" / "Sandbox".
+
+# --- Sessions: conversational context only. Case + baseline state live in the file-backed
+#     store owned by tool.py (state/<site_id>.json), never here. (_SessionStoreConfig)
+session:
+  type: in_memory
+  cache:
+    size: 256
+
+# --- Telegram: the only user-facing interface. Inbound webhook -> watchdog_supervisor.
+#     bot_token / webhook_secret come from the environment (AK_TELEGRAM__*). (_TelegramConfig)
+telegram:
+  agent: watchdog_supervisor
+  api_version: bot
+
+# --- Sandbox: anomaly_detector writes and runs the detector maths here at run time.
+#     local_subprocess (no isolation) is dev/test only; per_session so the detector can keep
+#     intermediate files across one sweep. Scoped to the one agent that needs it.
+#     (_SandboxConfig single-backend sugar -> synthesised "default" profile)
+sandbox:
+  enabled: true
+  type: local_subprocess
+  local_subprocess: {}
+  scope: per_session
+  agents:
+    - anomaly_detector
+
+# --- Scheduling: the daily sweep (recurring) and the 72-hour case chase (one-time). The local
+#     provider fires occurrences into the in-memory queue, so it requires the in_memory store
+#     and the queue pipeline below. Schedule tools are scoped to case_manager, which opens the
+#     chase. (_ScheduleConfig)
+schedule:
+  provider:
+    type: local
+  store:
+    type: in_memory
+  agents:
+    - case_manager
+
+# --- Execution: scheduling needs the queue pipeline. With the in_memory transport all pipeline
+#     components run in this one process, which is what makes the local schedule provider usable.
+#     (_ExecutionConfig / _QueuesConfig)
+execution:
+  mode: rest_sync
+  queues:
+    type: in_memory
+
+logging:
+  ak:
+    level: INFO
+
+# Agent-level test comparison mode (agentkernel.test). The deterministic detector / tool / state
+# tests do not use this.
+test:
+  mode: fallback
