@@ -8,6 +8,6 @@ private_subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
 
 # secrets - pass via -var / TF_VAR_* / a *.auto.tfvars that is gitignored
 gemini_api_key          = ""
-agent_model             = "gemini-2.0-flash"
+agent_model             = "gemini-flash-lite-latest"
 telegram_bot_token      = ""
 telegram_webhook_secret = ""

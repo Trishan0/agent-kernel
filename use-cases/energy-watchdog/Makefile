@@ -20,7 +20,10 @@ demo:  ## Trigger one sweep now. Usage: make demo SITE=colombo-plant-1 DATE=2026
 register-sweeps:  ## Register the recurring 06:00 Asia/Colombo sweep for every site (needs `make serve` running)
 	uv run python scripts/register_sweeps.py
 
-test:  ## Run the test suite
+test:  ## Run the deterministic test suite (no LLM, no server)
+	uv run pytest -q -m "not integration"
+
+test-all:  ## Run every test, including the integration + agent-level ones (needs a model key)
 	uv run pytest -q
 
 lint:  ## Check formatting and imports

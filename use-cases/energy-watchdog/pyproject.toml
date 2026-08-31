@@ -8,6 +8,7 @@ dependencies = [
     "agentkernel[cli,openai,aws,telegram,api,cron]>=0.8.1",
     "pandas>=2.2",
     "httpx>=0.27",
+    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]

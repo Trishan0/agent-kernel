@@ -43,7 +43,7 @@ variable "gemini_api_key" {
 
 variable "agent_model" {
   type        = string
-  default     = "gemini-2.0-flash"
+  default     = "gemini-flash-lite-latest"
   description = "Model name for the agents (AK_AGENT_MODEL)"
 }
 

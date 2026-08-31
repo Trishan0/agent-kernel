@@ -10,9 +10,12 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from dotenv import load_dotenv
 
 import tool
 from sites import load_sites
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = ROOT / "data" / "fixtures"

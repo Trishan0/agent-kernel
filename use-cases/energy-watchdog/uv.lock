@@ -769,6 +769,7 @@ dependencies = [
     { name = "agentkernel", extra = ["api", "aws", "cron", "openai", "telegram"] },
     { name = "httpx" },
     { name = "pandas" },
+    { name = "python-dotenv" },
 ]
 
 [package.optional-dependencies]
@@ -805,6 +806,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'request-handler'", specifier = ">=0.27" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "pandas", marker = "extra == 'agent-runner'", specifier = ">=2.2" },
+    { name = "python-dotenv", specifier = ">=1.0" },
 ]
 provides-extras = ["request-handler", "response-handler", "agent-runner"]
 

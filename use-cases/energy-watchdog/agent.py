@@ -14,8 +14,12 @@ deterministic oracle the test suite checks the sandbox output against (no LLM in
 
 from __future__ import annotations
 
+import os
+
+import agents.run
 from agentkernel.openai import OpenAIToolBuilder
 from agents import Agent
+from agents.run import DEFAULT_MAX_TURNS, AgentRunner
 
 from llm import agent_model
 from tool import (
@@ -32,6 +36,27 @@ from tool import (
     update_baseline,
     update_case,
 )
+
+# The sweep chain (supervisor -> detector -> investigator -> case_manager, ~15-20 tool calls in
+# one run) needs more than the OpenAI Agents SDK's default of 10 turns. Agent Kernel calls
+# Runner.run() with no max_turns, so raise it through the SDK's public runner hook rather than
+# touching the framework.
+_MAX_TURNS = int(os.environ.get("AK_AGENT_MAX_TURNS", "40"))
+
+
+class _WatchdogRunner(AgentRunner):
+    async def run(self, starting_agent, input, **kwargs):  # type: ignore[override]
+        if kwargs.get("max_turns", DEFAULT_MAX_TURNS) == DEFAULT_MAX_TURNS:
+            kwargs["max_turns"] = _MAX_TURNS
+        return await super().run(starting_agent, input, **kwargs)
+
+    def run_streamed(self, starting_agent, input, **kwargs):  # type: ignore[override]
+        if kwargs.get("max_turns", DEFAULT_MAX_TURNS) == DEFAULT_MAX_TURNS:
+            kwargs["max_turns"] = _MAX_TURNS
+        return super().run_streamed(starting_agent, input, **kwargs)
+
+
+agents.run.set_default_agent_runner(_WatchdogRunner())
 
 # --------------------------------------------------------------------------------------------
 # The analysis anomaly_detector runs in the sandbox via run_code.
@@ -299,15 +324,13 @@ You handle three kinds of input.
 Message: {"site_id": ..., "target_date": ..., "findings": [{candidate, classification, reason,
 evidence}, ...]}. For EACH finding:
 
-  1. Estimate the monthly cost in LKR from the candidate magnitude and the site tariff
-     (get_site_profile -> tariff). Guidance:
-       - night_baseload: implied_kwh_per_month * tariff.blended_lkr_per_kwh
-       - solar_yield: (expected_kwh - actual_kwh) * 30 * tariff.day_lkr_per_kwh   (lost daytime
-         generation you now buy at the day rate)
-       - off_schedule_load: excess_kwh * <number of such closed periods per month, assume 4> *
-         the applicable tariff rate (peak/day/offpeak by the affected hours; use day rate for
-         08:00-18:00)
-     Round to a whole number of rupees.
+  1. Estimate the monthly cost in LKR. Call get_site_profile first and read the tariff. Compute
+     it EXACTLY as below - multiply, do not divide, and keep every rupee:
+       - night_baseload: magnitude.implied_kwh_per_month * tariff.blended_lkr_per_kwh
+         e.g. 4374 kWh * 45.375 LKR/kWh = 198,470 LKR
+       - solar_yield: (magnitude.expected_kwh - magnitude.actual_kwh) * 30 * tariff.day_lkr_per_kwh
+       - off_schedule_load: magnitude.excess_kwh * 4 * tariff.day_lkr_per_kwh
+     Round to a whole number of rupees. Sanity-check the order of magnitude before continuing.
   2. Write the alert text: one-line headline; then the classification and the investigator's
      reason; then at least two evidence bullets; then "Est. monthly cost: LKR <n>"; then
      "Suggested check: <one concrete thing to look at>". Keep the whole message well under 4096
