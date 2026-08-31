@@ -1,0 +1,34 @@
+[project]
+name = "energy-watchdog"
+version = "0.1.0"
+description = "Energy Anomaly Watchdog — multi-agent Telegram watchdog for interval electricity and rooftop-solar data"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "agentkernel[cli,openai,aws,telegram,api,cron]>=0.8.1",
+    "pandas>=2.2",
+    "httpx>=0.27",
+]
+
+[dependency-groups]
+dev = [
+    "agentkernel[test]>=0.8.1",
+    "black>=23.0.0",
+    "isort>=5.0.0",
+    "mypy>=1.0.0",
+    "pytest>=8.0.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+agentkernel = { path = "../../ak-py", editable = true }
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.black]
+line-length = 120
+target-version = ["py312"]

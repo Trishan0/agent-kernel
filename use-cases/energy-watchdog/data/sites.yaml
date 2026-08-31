@@ -1,0 +1,25 @@
+sites:
+  - site_id: colombo-plant-1
+    name: Colombo Plant 1
+    latitude: 6.9271
+    longitude: 79.8612
+    timezone: Asia/Colombo
+    connected_load_kw: 250
+    solar_kwp: 100
+    telegram_chat_id: -1001234567890
+    tariff:
+      # Fill from the current CEB commercial tariff schedule. Placeholders below.
+      peak_lkr_per_kwh: 0.0
+      day_lkr_per_kwh: 0.0
+      offpeak_lkr_per_kwh: 0.0
+    calendar:
+      working_days: [mon, tue, wed, thu, fri, sat]
+      closed_dates: ["2026-08-25"]
+    thresholds:
+      baseload_creep_pct: 15
+      baseload_creep_min_kw: 2
+      solar_yield_floor_pct: 75
+      off_schedule_load_pct: 40
+  - site_id: kandy-hotel-1
+    # ... a second site with solar_kwp: 0, its own chat id, and no injected faults,
+    # to prove that silence works
