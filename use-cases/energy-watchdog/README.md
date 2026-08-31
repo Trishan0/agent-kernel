@@ -22,6 +22,18 @@ A dashboard does not help, because nobody watches a dashboard. What a facilities
 be interrupted **only** when there is something worth acting on, with the evidence and a rupee
 figure attached, and to be chased if they ignore it. Everything else should be silence.
 
+### UN Sustainable Development Goals
+
+The watchdog cuts electricity that is being paid for and wasted at commercial and industrial
+sites, and keeps rooftop solar generating at capacity. It contributes to:
+
+- **SDG 7 — Affordable and Clean Energy:** improves end-use energy efficiency and protects solar
+  self-generation, so a site buys less grid power.
+- **SDG 12 — Responsible Consumption and Production:** turns raw interval data into a specific,
+  actionable waste finding a facilities team will actually act on.
+- **SDG 13 — Climate Action:** every kWh not wasted is grid generation (still substantially
+  thermal in Sri Lanka) not burned.
+
 ## 2. Solution overview
 
 Four agents, wired with Agent Kernel handoffs, driven by a scheduled morning sweep — not by
@@ -111,8 +123,9 @@ make test
 
 `data/sites.yaml` carries every per-site value: location, connected load, `solar_kwp`, the Telegram
 chat id, the CEB tariff bands, the closed-day calendar and the detector thresholds. The tariff
-figures are placeholders in the vicinity of the current CEB commercial time-of-use schedule —
-confirm them against the live CEB tariff before a real demo.
+figures are indicative of the CEB General Purpose 2 (GP-2) Time-of-Use schedule effective October
+2025; verify against the current PUCSL/CEB gazette before a production deployment. The
+`telegram_chat_id` values are placeholders — set them to your own group chat ids.
 
 ## 4. How to run the solution
 
@@ -175,6 +188,7 @@ uv run python demo.py --site colombo-plant-1 --date 2026-08-24
 ### Local development
 
 - `uv run python data/simulate.py ...` — regenerate or fault-inject the data.
-- `uv run pytest -q` — the deterministic detector / state / schedule suite (no LLM). Agent-level
-  tests in `tests/test_agents.py` run only when a model key is set.
+- `make test` — the deterministic detector / state / schedule suite (no LLM, no server).
+  `make test-all` additionally runs the integration + agent-level tests (needs a model key and a
+  free port 8000).
 - `SPEC.md` and `AGENTS.md` describe what was built and the rules it was built under.

@@ -12,6 +12,9 @@ dist_*/
 # Secrets
 .env
 
+# Competition handout, not our work
+Minicompetition GUIDELINES*.pdf
+
 # Generated dependency exports (never commit)
 requirements*.txt
 

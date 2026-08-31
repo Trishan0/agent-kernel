@@ -6,12 +6,15 @@ sites:
     timezone: Asia/Colombo
     connected_load_kw: 250
     solar_kwp: 100
-    telegram_chat_id: -1001234567890
+    # Replace with your Telegram GROUP chat id (a negative number). Get it by adding the bot to
+    # the group, posting a message, then reading `result[].message.chat.id` from
+    #   curl "https://api.telegram.org/bot<TOKEN>/getUpdates"
+    telegram_chat_id: -1000000000001
     tariff:
-      # CEB commercial time-of-use bands (LKR/kWh). PLACEHOLDER figures in the vicinity of the
-      # current CEB "General Purpose" TOU schedule — confirm against the live CEB tariff before
-      # the demo (a judge may ask where the rupee figure comes from). Band *times* follow the
-      # CEB TOU schedule and live in data/sites.py; only the rates live here.
+      # Energy charges (LKR/kWh), indicative of the CEB General Purpose 2 (GP-2) Time-of-Use
+      # schedule effective October 2025. Verify against the current PUCSL/CEB gazette before a
+      # production deployment. Band *times* follow the CEB TOU schedule and live in
+      # data/sites.py; only the rates live here.
       peak_lkr_per_kwh: 70.0
       day_lkr_per_kwh: 45.0
       offpeak_lkr_per_kwh: 32.0
@@ -31,7 +34,7 @@ sites:
     timezone: Asia/Colombo
     connected_load_kw: 120
     solar_kwp: 0
-    telegram_chat_id: -1009876543210
+    telegram_chat_id: -1000000000002
     tariff:
       peak_lkr_per_kwh: 70.0
       day_lkr_per_kwh: 45.0
